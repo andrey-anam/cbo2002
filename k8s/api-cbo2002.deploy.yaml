@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-cbo2002-deploy
+  namespace: cbo2002
+  labels:
+    app: api-cbo2002
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-cbo2002
+  template:
+    metadata:
+      labels:
+        app: api-cbo2002
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: api-cbo2002
+          image: andreyanam/api-cbo2002:latest 
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8888
+          envFrom:
+            - secretRef:
+                name: api-cbo2002-secrets
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "3Gi"
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8888
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 8888
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
