@@ -16,3 +16,5 @@ package-lock.json
 # Arquivos temporários
 npm-debug.log
 dist/
+
+k8s
