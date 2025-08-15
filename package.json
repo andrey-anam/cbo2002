@@ -4,8 +4,10 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "dev": "NODE_ENV=DEV nodemon",
-    "dev:watch": "NODE_ENV=DEV nodemon --legacy-watch",
+    "dev": "NODE_ENV=DEV ts-node src/main.ts",
+    "dev:watch": "NODE_ENV=DEV nodemon --watch src --exec ts-node src/main.ts",
+    "build": "tsc",
+    "serve": "node dist/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -26,5 +28,8 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "mongodb": "^6.18.0"
+  },
+  "engines": {
+    "node": "24.5.0"
   }
 }

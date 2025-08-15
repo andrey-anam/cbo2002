@@ -3,3 +3,5 @@ node_modules
 # .nvmrc
 .nodemon.*
 dist
+.tsbuildinfo
+.nvmrc
