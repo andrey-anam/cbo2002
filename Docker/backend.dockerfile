@@ -18,4 +18,4 @@ COPY --from=build /app ./
 
 EXPOSE 8888
 
-ENTRYPOINT [ "npm", "serve" ]
+ENTRYPOINT [ "npm", "run", "serve" ]
