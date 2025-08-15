@@ -27,7 +27,7 @@ const mongoClient = new MongoClient(MONGO_URI);
 export async function connect() {
     try {
         await mongoClient.connect();
-        const db = mongoClient.db('structure');
+        const db = mongoClient.db(DB_NAME);
 
         console.info(`Sucessfully conected with Mongo DB at database: ${DB_NAME}`);
 
