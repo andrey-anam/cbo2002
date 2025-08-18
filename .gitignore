@@ -1,0 +1,13 @@
+node_modules
+.env.*
+# .nvmrc
+.nodemon.*
+dist
+.tsbuildinfo
+.nvmrc
+.idea
+
+# k8s
+k8s/*.secret*
+k8s/*secret*
+/k8s/*-secret*

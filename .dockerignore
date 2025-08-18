@@ -1,0 +1,22 @@
+# Ignorar pasta Docker
+Docker/
+
+# Ignorar dependências
+node_modules/
+
+# Ignorar arquivos de controle
+.git
+.gitignore
+.tsbuildinfo
+.nvmrc
+nodemon.json
+package-lock.json
+.env.*
+
+# Arquivos temporários
+npm-debug.log
+dist/
+
+k8s/
+
+.idea

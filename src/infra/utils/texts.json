@@ -1,0 +1,107 @@
+{
+    "examples": {
+        "label": {
+            "bigGroup": "MEMBROS DAS FORÇAS ARMADAS, POLICIAIS E BOMBEIROS MILITARES.",
+            "family": "Oficiais generais das forças armadas.",
+            "occupation": "Oficial general da aeronáutica.",
+            "mainSubGroup": "MEMBROS DAS FORÇAS ARMADAS.",
+            "subGroup": "MEMBROS DAS FORÇAS ARMADAS."
+        },
+        "id": {
+            "bigGroup": 0,
+            "family": 101,
+            "subGroupId": 10,
+            "occupationId": 10105,
+            "mainSubGroup": 1
+        }
+    },
+    "descriptions": {
+        "label": "Título/descrição do item.",
+        "id": "ID do item.",
+        "subgroupId": "ID do Sub Grupo.",
+        "occupationId": "ID da Ocupação.",
+        "mainSubGroupId": "ID do Grupo Principal.",
+        "familyId": "ID da Família.",
+        "bigGroupId": "ID do Grande Grupo."
+    },
+    "messages": {
+        "success": {
+            "bigGroup": {
+                "get": {
+                    "singular": "Grande Grupo encontrado com sucesso!",
+                    "plural": "Grandes Grupos listados com sucesso!"
+                }
+            },
+            "family": {
+                "get": {
+                    "singular": "Família encontrada com sucesso!",
+                    "plural": "Famílias listadas com sucesso!"
+                }
+            },
+            "mainSubGroup": {
+                "get": {
+                    "singular": "Sub Grupo Principal encontrado com sucesso!",
+                    "plural": "Sub Grupos Principais listados com sucesso!"
+                }
+            },
+            "occupation": {
+                "get": {
+                    "singular": "Ocupação encontrada com sucesso!",
+                    "plural": "Ocupações listadas com sucesso!"
+                }
+            },
+            "subGroup": {
+                "get": {
+                    "singular": "Sub Grupo encontrado com sucesso!",
+                    "plural": "Sub Grupos listados com sucesso!"
+                }
+            },
+            "synonymous": {
+                "get": {
+                    "singular": "Sinônimo encontrado com sucesso!",
+                    "plural": "Sinônimos listados com sucesso!"
+                }
+            }
+        },
+        "error": {
+            "bigGroup":{
+                "get": {
+                    "singular": "Grande Grupo não encontrado!",
+                    "plural": "Não foi possível listar os Grandes Grupos!"
+                }
+            },
+            "family":{
+                "get": {
+                    "singular": "Família não encontrada!",
+                    "plural": "Não foi possível listar as Famílias!"
+                }
+            },
+            "mainSubGroup":{
+                "get": {
+                    "singular": "Sub Grupo Principal não encontrado!",
+                    "plural": "Não foi possível listar os Sub Grupos Principais!"
+                }
+            },
+            "occupation":{
+                "get": {
+                    "singular": "Ocupação não encontrada!",
+                    "plural": "Não foi possível listar as Ocupações!"
+                }
+            },
+            "subGroup":{
+                "get": {
+                    "singular": "Sub Grupo não encontrado!",
+                    "plural": "Não foi possível listar os Sub Grupos!"
+                }
+            },
+            "synonymous":{
+                "get": {
+                    "singular": "Sinônimo não encontrado!",
+                    "plural": "Não foi possível listar os Sinônimos!"
+                }
+            },
+            "invalidId": "Por favor verifique o ID!",
+            "internalServerError": "Ocorreu um erro inesperado"
+        }
+    }
+}

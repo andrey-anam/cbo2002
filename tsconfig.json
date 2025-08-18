@@ -1,0 +1,65 @@
+{
+  "compilerOptions": {
+    /* -----------------------------------------------------
+     * Modo e alvo de compilação
+     * --------------------------------------------------- */
+    "target": "ES2022", /* Versão de JavaScript de saída */
+    "module": "nodenext", /* Usa módulos ES modernos */
+    "moduleResolution": "NodeNext", /* Resolve módulos no padrão Node.js atual */
+    "lib": [
+      "ES2022"
+    ], /* Inclui APIs modernas do JS */
+    "allowJs": false, /* Não compila arquivos .js */
+    "checkJs": false, /* Ignora checagem de tipos em .js */
+    "types": [
+      "node"
+    ], /* Inclui tipos do Node.js */
+    "esModuleInterop": true, /* Facilita import/export padrão */
+    "forceConsistentCasingInFileNames": true, /* Evita erros de case em importações */
+    /* -----------------------------------------------------
+     * Segurança de tipos
+     * --------------------------------------------------- */
+    "strict": true, /* Ativa todos os checks estritos */
+    "noImplicitAny": true, /* Não permite variáveis sem tipo */
+    "strictNullChecks": true, /* Força verificação de null/undefined */
+    "strictBindCallApply": true, /* Checa bind/call/apply */
+    "strictFunctionTypes": true, /* Checa compatibilidade de funções */
+    "noImplicitThis": true, /* Impede uso inseguro do this */
+    "alwaysStrict": true, /* Gera código em modo estrito */
+    /* -----------------------------------------------------
+     * Qualidade do código
+     * --------------------------------------------------- */
+    "noUnusedLocals": true, /* Erro se variável não for usada */
+    "noUnusedParameters": true, /* Erro se parâmetro não for usado */
+    "noFallthroughCasesInSwitch": true, /* Evita casos sem break no switch */
+    "exactOptionalPropertyTypes": true, /* Torna opcionais mais precisos */
+    "noUncheckedIndexedAccess": true, /* undefined ao acessar índice inexistente */
+    "noImplicitOverride": true, /* Obriga override explícito */
+    "noPropertyAccessFromIndexSignature": true, /* Obriga acesso seguro em index signatures */
+    /* -----------------------------------------------------
+     * Saída e paths
+     * --------------------------------------------------- */
+    "outDir": "./dist", /* Pasta de saída */
+    "rootDir": "./src", /* Pasta raiz dos arquivos TS */
+    "baseUrl": ".",
+    "resolveJsonModule": true, /* Permite importar JSON */
+    "declaration": true, /* Gera arquivos .d.ts */
+    "declarationMap": true, /* Gera source maps para tipos */
+    "sourceMap": true, /* Gera source maps para debug */
+    "removeComments": false, /* Mantém comentários */
+    "pretty": true, /* Saída de erros formatada */
+    /* -----------------------------------------------------
+     * Incremental e performance
+     * --------------------------------------------------- */
+    "incremental": true, /* Compilação incremental */
+    "tsBuildInfoFile": "./.tsbuildinfo" /* Arquivo de cache */
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts"
+  ]
+}
