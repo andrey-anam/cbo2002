@@ -3,8 +3,6 @@ kind: Ingress
 metadata:
   name: api-cbo2002-ingress
   namespace: cbo2002
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
   rules:
@@ -18,7 +16,3 @@ spec:
                 name: api-cbo2002-service
                 port:
                   number: 80
-  tls:
-    - hosts:
-        - api.seu-dominio.com.br
-      secretName: cbo2002-tls
