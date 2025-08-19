@@ -1,6 +1,6 @@
 import { BigGroupService } from "../services/big_group.service";
 import { Request, Response } from "express";
-import {getOffset, getTotalPages, texts} from "../../../infra/utils";
+import { getOffset, getTotalPages, texts } from "../../../infra/utils";
 import {
     BigGroupFindAllResponseSchema,
     BigGroupFindOneResponseSchema,
@@ -10,12 +10,13 @@ import {
     TErrorResponse,
     TPagination
 } from "../../../infra/docs/schemas";
-import {TBigGroup} from "../domain/big_group.domain";
+import { TBigGroup } from "../domain/big_group.domain";
 import {
     openApiRegistry,
     PBigGroupIdParam,
     QPageParams,
-    QPerPageParams
+    QPerPageParams,
+    QSearchParamsBigGroupSchema
 } from "../../../infra/docs/openapi_config";
 import { z } from "zod";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
@@ -33,6 +34,50 @@ openApiRegistry.registerPath({
         query: z.object({
             page: QPageParams,
             perPage: QPerPageParams
+        })
+    },
+    responses: {
+        200: {
+            description: 'Lista de Grandes Grupos',
+            content: {
+                'application/json': {
+                    schema: BigGroupFindAllResponseSchema,
+                },
+            },
+        },
+        204: {
+            description: 'Nenhum Grande Grupo encontrado',
+        },
+        500: {
+            description: 'Erro interno do servidor',
+            content: {
+                'application/json': {
+                    schema: ErrorResponseSchema,
+                },
+            },
+        },
+        default: {
+            description: 'Erro interno do servidor',
+            content: {
+                'application/json': {
+                    schema: ErrorResponseSchema,
+                },
+            },
+        },
+    },
+});
+
+openApiRegistry.registerPath({
+    method: 'get',
+    path: '/big-groups/search',
+    tags: ['Grande Grupo'],
+    summary: 'Lista todos os Grandes Grupos, de acordo com o filtro de pesquisa.',
+    description: 'Retorna uma lista paginada de todos os Grandes Grupos, de acordo com o filtro de pesquisa.',
+    request: {
+        query: z.object({
+            page: QPageParams,
+            perPage: QPerPageParams,
+            q: QSearchParamsBigGroupSchema
         })
     },
     responses: {
@@ -124,8 +169,8 @@ openApiRegistry.registerPath({
 export class BigGroupController {
     constructor(private readonly bigGroupSvc: BigGroupService) { }
 
-    async findAll(req: Request, res: Response) {       
-        
+    async findAll(req: Request, res: Response) {
+
         try {
             const {
                 page = 1,
@@ -141,7 +186,7 @@ export class BigGroupController {
                 data,
                 total: totalItems
             } = await this.bigGroupSvc.findAll(opts);
-            
+
 
             const totalPages = getTotalPages(totalItems, Number(perPage));
 
@@ -162,7 +207,7 @@ export class BigGroupController {
             }
 
             res.status(data.length > 0 ? 200 : 204).json(result).end();
-            
+
         } catch (cause) {
             const errorResponse: TErrorResponse = {
                 code: 'CÓDIGO_GENÉRICO',
@@ -185,7 +230,7 @@ export class BigGroupController {
             const {
                 id
             } = req.params
-    
+
             if (!id) {
                 errorResponse = {
                     success: false,
@@ -194,9 +239,9 @@ export class BigGroupController {
                 };
                 res.status(400).json(errorResponse).end();
             }
-    
+
             const data = await this.bigGroupSvc.findOneById(Number(id));
-    
+
             if (!data) {
                 errorResponse = {
                     success: false,
@@ -206,7 +251,7 @@ export class BigGroupController {
 
                 res.status(404).json(errorResponse).end();
             }
-            
+
             successResponse = {
                 success: true,
                 message: texts.messages.success.bigGroup.get.singular,
@@ -224,6 +269,80 @@ export class BigGroupController {
 
             console.error('There was an error during get Big Group, controller', JSON.stringify(errorResponse, null, 2));
             res.status(500).json(errorResponse).end();
+        }
+    }
+
+    async searchByLabel(req: Request, res: Response) {
+        let errorResponse: TErrorResponse;
+        let successResponse: TBigGroupFindAllResponse;
+        try {
+            const {
+                page = 1,
+                perPage = 100,
+                q
+            } = req.query;
+
+            const opts: { limit: number, offset: number, match?: any } = {
+                limit: Number(perPage),
+                offset: getOffset(page as number, perPage as number)
+            }
+
+            if (!q || typeof q !== 'string' || q.trim() === '') {
+                errorResponse = {
+                    success: false,
+                    code: 'INVALID_QUERY',
+                    message: 'Por favor, forneça um termo de pesquisa válido.'
+                }
+
+                return res.status(400).json(errorResponse).end();
+            }
+
+            const regex = new RegExp(q.trim(), 'i');
+
+            opts.match = { label: regex };
+
+            const {data, total: totalItems} = await this.bigGroupSvc.findAll(opts);
+
+            if (data.length <= 0) {
+                errorResponse = {
+                    success: false,
+                    code: 'NOT_FOUND',
+                    message: texts.messages.error.bigGroup.get.plural
+                };
+                
+                return res.status(404).json(errorResponse).end();
+            }
+
+            const totalPages = getTotalPages(totalItems, Number(perPage));
+
+            const pagination: TPagination = {
+                items: data.length,
+                totalItems,
+                page: Number(page),
+                perPage: Number(perPage),
+                totalPages,
+                hasNext: Number(page) < totalPages
+            }
+
+            successResponse = {
+                success: true,
+                message: texts.messages.success.bigGroup.get.plural,
+                data,
+                pagination
+            }
+
+            return res.status(200).json(successResponse).end();
+
+        } catch (cause) {
+            errorResponse = {
+                success: false,
+                code: 'INTERNAL_SERVER_ERROR',
+                message: texts.messages.error.internalServerError,
+                cause
+            };
+
+            console.error('There was an error during search Big Groups, controller', JSON.stringify(errorResponse, null, 2));
+            return res.status(500).json(errorResponse).end();
         }
     }
 }

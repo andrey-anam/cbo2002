@@ -6,7 +6,7 @@ import {
     OccupationFindOneResponseSchema,
     ErrorResponseSchema, TPagination, TOccupationFindAllResponse, TErrorResponse, TOccupationFindOneResponse
 } from "../../../infra/docs/schemas";
-import {openApiRegistry, POccupationIdParam, QFamilyIdParam, QPageParams, QPerPageParams} from "../../../infra/docs/openapi_config";
+import {openApiRegistry, POccupationIdParam, QFamilyIdParam, QPageParams, QPerPageParams, QSearchParamsOccupationSchema} from "../../../infra/docs/openapi_config";
 import { z } from "zod";
 import {TOccupation} from "../domain/occupation.domain";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
@@ -33,6 +33,50 @@ openApiRegistry.registerPath({
             content: {
                 'application/json': {
                     schema: OccupationFindAllResponseSchema,
+                },
+            },
+        },
+        204: {
+            description: 'Nenhuma Ocupação encontrada',
+        },
+        500: {
+            description: 'Erro interno do servidor',
+            content: {
+                'application/json': {
+                    schema: ErrorResponseSchema,
+                },
+            },
+        },
+        default: {
+            description: 'Erro interno do servidor',
+            content: {
+                'application/json': {
+                    schema: ErrorResponseSchema,
+                },
+            },
+        },
+    },
+});
+
+openApiRegistry.registerPath({
+    method: 'get',
+    path: '/occupations/search',
+    tags: ['Ocupação'],
+    summary: 'Lista todas as Ocupações, de acordo com o filtro de pesquisa.',
+    description: 'Retorna uma lista paginada de todas as Ocupações, de acordo com o filtro de pesquisa.',
+    request: {
+        query: z.object({
+            page: QPageParams,
+            perPage: QPerPageParams,
+            q: QSearchParamsOccupationSchema
+        })
+    },
+    responses: {
+        200: {
+            description: 'Lista de Ocupações',
+            content: {
+                'application/json': {
+                    schema: OccupationFindAllResponseSchema
                 },
             },
         },
@@ -112,7 +156,6 @@ openApiRegistry.registerPath({
         },
     },
 });
-
 
 export class OccupationController {
     constructor(private readonly occupationSvc: OccupationService) { }
@@ -224,6 +267,80 @@ export class OccupationController {
 
             console.error('There was an error during get Occupation, controller', JSON.stringify(errorResponse, null, 2));
             res.status(500).json(errorResponse).end();
+        }
+    }
+
+    async searchByLabel(req: Request, res: Response) {
+        let errorResponse: TErrorResponse;
+        let successResponse: TOccupationFindAllResponse;
+        try {
+            const {
+                page = 1,
+                perPage = 100,
+                q
+            } = req.query;
+
+            const opts: { limit: number, offset: number, match?: any } = {
+                limit: Number(perPage),
+                offset: getOffset(page as number, perPage as number)
+            }
+
+            if (!q || typeof q !== 'string' || q.trim() === '') {
+                errorResponse = {
+                    success: false,
+                    code: 'INVALID_QUERY',
+                    message: 'Por favor, forneça um termo de pesquisa válido.'
+                }
+
+                return res.status(400).json(errorResponse).end();
+            }
+
+            const regex = new RegExp(q.trim(), 'i');
+
+            opts.match = { label: regex };
+
+            const {data, total: totalItems} = await this.occupationSvc.findAll(opts);
+
+            if (data.length <= 0) {
+                errorResponse = {
+                    success: false,
+                    code: 'NOT_FOUND',
+                    message: texts.messages.error.occupation.get.plural
+                };
+                
+                return res.status(404).json(errorResponse).end();
+            }
+
+            const totalPages = getTotalPages(totalItems, Number(perPage));
+
+            const pagination: TPagination = {
+                items: data.length,
+                totalItems,
+                page: Number(page),
+                perPage: Number(perPage),
+                totalPages,
+                hasNext: Number(page) < totalPages
+            }
+
+            successResponse = {
+                success: true,
+                message: texts.messages.success.occupation.get.plural,
+                data,
+                pagination
+            }
+
+            return res.status(200).json(successResponse).end();
+
+        } catch (cause) {
+            errorResponse = {
+                success: false,
+                code: 'INTERNAL_SERVER_ERROR',
+                message: texts.messages.error.internalServerError,
+                cause
+            };
+
+            console.error('There was an error during search Occupation, controller', JSON.stringify(errorResponse, null, 2));
+            return res.status(500).json(errorResponse).end();
         }
     }
 }

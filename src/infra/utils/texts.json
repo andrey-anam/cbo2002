@@ -1,11 +1,12 @@
 {
     "examples": {
         "label": {
-            "bigGroup": "MEMBROS DAS FORÇAS ARMADAS, POLICIAIS E BOMBEIROS MILITARES.",
-            "family": "Oficiais generais das forças armadas.",
-            "occupation": "Oficial general da aeronáutica.",
-            "mainSubGroup": "MEMBROS DAS FORÇAS ARMADAS.",
-            "subGroup": "MEMBROS DAS FORÇAS ARMADAS."
+            "bigGroup": "MEMBROS DAS FORÇAS ARMADAS, POLICIAIS E BOMBEIROS MILITARES",
+            "family": "Oficiais generais das forças armadas",
+            "occupation": "Oficial general da aeronáutica",
+            "mainSubGroup": "MEMBROS DAS FORÇAS ARMADAS",
+            "subGroup": "MEMBROS DAS FORÇAS ARMADAS",
+            "synonymous": "Brigadeiro"
         },
         "id": {
             "bigGroup": 0,

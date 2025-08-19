@@ -6,7 +6,7 @@ import {
     MainSubGroupFindOneResponseSchema,
     ErrorResponseSchema, TPagination, TMainSubGroupFindAllResponse, TErrorResponse, TMainSubGroupFindOneResponse
 } from "../../../infra/docs/schemas";
-import { openApiRegistry, PMainSubGroupIdParam, QBigGroupIdParam, QPageParams, QPerPageParams } from "../../../infra/docs/openapi_config";
+import { openApiRegistry, PMainSubGroupIdParam, QBigGroupIdParam, QPageParams, QPerPageParams, QSearchParamsMainSubGroupSchema } from "../../../infra/docs/openapi_config";
 import { z } from "zod";
 import { TMainSubGroup } from "../domain/main_sub_group.domain";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
@@ -30,6 +30,50 @@ openApiRegistry.registerPath({
     responses: {
         200: {
             description: 'Lista de Sub Grupos Principais',
+            content: {
+                'application/json': {
+                    schema: MainSubGroupFindAllResponseSchema,
+                },
+            },
+        },
+        204: {
+            description: 'Nenhum Sub Grupo Principal encontrado',
+        },
+        500: {
+            description: 'Erro interno do servidor',
+            content: {
+                'application/json': {
+                    schema: ErrorResponseSchema,
+                },
+            },
+        },
+        default: {
+            description: 'Erro interno do servidor',
+            content: {
+                'application/json': {
+                    schema: ErrorResponseSchema,
+                },
+            },
+        },
+    },
+});
+
+openApiRegistry.registerPath({
+    method: 'get',
+    path: '/main-sub-groups/search',
+    tags: ['Sub Grupo Principal'],
+    summary: 'Lista todas as Sub Grupo Principais, de acordo com o filtro de pesquisa.',
+    description: 'Retorna uma lista paginada de todas as Sub Grupo Principais, de acordo com o filtro de pesquisa.',
+    request: {
+        query: z.object({
+            page: QPageParams,
+            perPage: QPerPageParams,
+            q: QSearchParamsMainSubGroupSchema
+        })
+    },
+    responses: {
+        200: {
+            description: 'Lista de Sub Grupo Principais',
             content: {
                 'application/json': {
                     schema: MainSubGroupFindAllResponseSchema,
@@ -126,7 +170,7 @@ export class MainSubGroupController {
                 bigGroupId
             } = req.query
 
-            const opts: {offset: number, limit: number, match?: any} = {
+            const opts: { offset: number, limit: number, match?: any } = {
                 limit: Number(perPage),
                 offset: getOffset(page as number, perPage as number)
             }
@@ -226,6 +270,80 @@ export class MainSubGroupController {
 
             console.error('There was an error during get Main Sub Group, controller', JSON.stringify(errorResponse, null, 2));
             res.status(500).json(errorResponse).end();
+        }
+    }
+
+    async searchByLabel(req: Request, res: Response) {
+        let errorResponse: TErrorResponse;
+        let successResponse: TMainSubGroupFindAllResponse;
+        try {
+            const {
+                page = 1,
+                perPage = 100,
+                q
+            } = req.query;
+
+            const opts: { limit: number, offset: number, match?: any } = {
+                limit: Number(perPage),
+                offset: getOffset(page as number, perPage as number)
+            }
+
+            if (!q || typeof q !== 'string' || q.trim() === '') {
+                errorResponse = {
+                    success: false,
+                    code: 'INVALID_QUERY',
+                    message: 'Por favor, forneça um termo de pesquisa válido.'
+                }
+
+                return res.status(400).json(errorResponse).end();
+            }
+
+            const regex = new RegExp(q.trim(), 'i');
+
+            opts.match = { label: regex };
+
+            const { data, total: totalItems } = await this.mainSubGroupSvc.findAll(opts);
+
+            if (data.length <= 0) {
+                errorResponse = {
+                    success: false,
+                    code: 'NOT_FOUND',
+                    message: texts.messages.error.mainSubGroup.get.plural
+                };
+
+                return res.status(404).json(errorResponse).end();
+            }
+
+            const totalPages = getTotalPages(totalItems, Number(perPage));
+
+            const pagination: TPagination = {
+                items: data.length,
+                totalItems,
+                page: Number(page),
+                perPage: Number(perPage),
+                totalPages,
+                hasNext: Number(page) < totalPages
+            }
+
+            successResponse = {
+                success: true,
+                message: texts.messages.success.mainSubGroup.get.plural,
+                data,
+                pagination
+            }
+
+            return res.status(200).json(successResponse).end();
+
+        } catch (cause) {
+            errorResponse = {
+                success: false,
+                code: 'INTERNAL_SERVER_ERROR',
+                message: texts.messages.error.internalServerError,
+                cause
+            };
+
+            console.error('There was an error during search Main Sub Group, controller', JSON.stringify(errorResponse, null, 2));
+            return res.status(500).json(errorResponse).end();
         }
     }
 }

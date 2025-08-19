@@ -12,6 +12,7 @@ const subGroupvc = new SubGroupService(subGroupRepo);
 const subGroupController = new SubGroupController(subGroupvc);
 
 subGroupRouter.get('/', subGroupController.findAll.bind(subGroupController));
+subGroupRouter.get('/search', subGroupController.searchByLabel.bind(subGroupController));
 subGroupRouter.get('/:id', subGroupController.findOneById.bind(subGroupController));
 
 export default subGroupRouter;

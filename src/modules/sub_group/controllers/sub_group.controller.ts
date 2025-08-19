@@ -11,7 +11,8 @@ import {
     PSubGroupIdParam,
     QMainSubGroupIdParam,
     QPageParams,
-    QPerPageParams
+    QPerPageParams,
+    QSearchParamsSubGroupSchema
 } from "../../../infra/docs/openapi_config";
 import { z } from "zod";
 import {TSubGroup} from "../domain/sub_group.domain";
@@ -31,6 +32,50 @@ openApiRegistry.registerPath({
             page: QPageParams,
             perPage: QPerPageParams,
             mainSubGroupId: QMainSubGroupIdParam
+        })
+    },
+    responses: {
+        200: {
+            description: 'Lista de Sub Grupos',
+            content: {
+                'application/json': {
+                    schema: SubGroupFindAllResponseSchema,
+                },
+            },
+        },
+        204: {
+            description: 'Nenhum Sub Grupo encontrado',
+        },
+        500: {
+            description: 'Erro interno do servidor',
+            content: {
+                'application/json': {
+                    schema: ErrorResponseSchema,
+                },
+            },
+        },
+        default: {
+            description: 'Erro interno do servidor',
+            content: {
+                'application/json': {
+                    schema: ErrorResponseSchema,
+                },
+            },
+        },
+    },
+});
+
+openApiRegistry.registerPath({
+    method: 'get',
+    path: '/sub-groups/search',
+    tags: ['Sub Grupo'],
+    summary: 'Lista todas as Sub Grupos, de acordo com o filtro de pesquisa.',
+    description: 'Retorna uma lista paginada de todas as Sub Grupos, de acordo com o filtro de pesquisa.',
+    request: {
+        query: z.object({
+            page: QPageParams,
+            perPage: QPerPageParams,
+            q: QSearchParamsSubGroupSchema
         })
     },
     responses: {
@@ -118,7 +163,6 @@ openApiRegistry.registerPath({
         },
     },
 });
-
 
 export class SubGroupController {
     constructor(private readonly subGroupSvc: SubGroupService) { }
@@ -230,6 +274,80 @@ export class SubGroupController {
 
             console.error('There was an error during get Sub Group, controller', JSON.stringify(errorResponse, null, 2));
             res.status(500).json(errorResponse).end();
+        }
+    }
+
+    async searchByLabel(req: Request, res: Response) {
+        let errorResponse: TErrorResponse;
+        let successResponse: TSubGroupFindAllResponse;
+        try {
+            const {
+                page = 1,
+                perPage = 100,
+                q
+            } = req.query;
+
+            const opts: { limit: number, offset: number, match?: any } = {
+                limit: Number(perPage),
+                offset: getOffset(page as number, perPage as number)
+            }
+
+            if (!q || typeof q !== 'string' || q.trim() === '') {
+                errorResponse = {
+                    success: false,
+                    code: 'INVALID_QUERY',
+                    message: 'Por favor, forneça um termo de pesquisa válido.'
+                }
+
+                return res.status(400).json(errorResponse).end();
+            }
+
+            const regex = new RegExp(q.trim(), 'i');
+
+            opts.match = { label: regex };
+
+            const {data, total: totalItems} = await this.subGroupSvc.findAll(opts);
+
+            if (data.length <= 0) {
+                errorResponse = {
+                    success: false,
+                    code: 'NOT_FOUND',
+                    message: texts.messages.error.subGroup.get.plural
+                };
+                
+                return res.status(404).json(errorResponse).end();
+            }
+
+            const totalPages = getTotalPages(totalItems, Number(perPage));
+
+            const pagination: TPagination = {
+                items: data.length,
+                totalItems,
+                page: Number(page),
+                perPage: Number(perPage),
+                totalPages,
+                hasNext: Number(page) < totalPages
+            }
+
+            successResponse = {
+                success: true,
+                message: texts.messages.success.subGroup.get.plural,
+                data,
+                pagination
+            }
+
+            return res.status(200).json(successResponse).end();
+
+        } catch (cause) {
+            errorResponse = {
+                success: false,
+                code: 'INTERNAL_SERVER_ERROR',
+                message: texts.messages.error.internalServerError,
+                cause
+            };
+
+            console.error('There was an error during search Sub Groups, controller', JSON.stringify(errorResponse, null, 2));
+            return res.status(500).json(errorResponse).end();
         }
     }
 }

@@ -17,6 +17,7 @@ import {
 } from './schemas';
 
 import { z } from "zod";
+import { texts } from '../utils';
 
 extendZodWithOpenApi(z)
 
@@ -168,7 +169,7 @@ export const QFamilyIdParam =
                     example: 101,
                     description: 'ID da Família'
                 })
-        );        
+        );
 
 export const POccupationIdParam =
     openApiRegistry
@@ -246,6 +247,8 @@ export const QPageParams =
                 })
         );
 
+
+
 export const QPerPageParams =
     openApiRegistry
         .registerParameter(
@@ -266,6 +269,102 @@ export const QPerPageParams =
                     default: 100
                 })
         );
+
+export const QSearchParamsBigGroupSchema =
+    z
+        .string()
+        .min(3, 'Termo de pesquisa deve ter pelo menos 3 caracteres')
+        .max(100, 'Termo de pesquisa deve ter no máximo 100 caracteres')
+        .trim()
+        .openapi({
+            param: {
+                name: 'q',
+                in: 'query',
+                example: texts.examples.label.bigGroup,
+                required: true
+            },
+            description: 'Termo de pesquisa para buscar ocupações, famílias, etc.'
+        })
+
+export const QSearchParamsMainSubGroupSchema =
+    z
+        .string()
+        .min(3, 'Termo de pesquisa deve ter pelo menos 3 caracteres')
+        .max(100, 'Termo de pesquisa deve ter no máximo 100 caracteres')
+        .trim()
+        .openapi({
+            param: {
+                name: 'q',
+                in: 'query',
+                example: texts.examples.label.mainSubGroup,
+                required: true
+            },
+            description: 'Termo de pesquisa para buscar ocupações, famílias, etc.'
+        })
+
+export const QSearchParamsSubGroupSchema =
+    z
+        .string()
+        .min(3, 'Termo de pesquisa deve ter pelo menos 3 caracteres')
+        .max(100, 'Termo de pesquisa deve ter no máximo 100 caracteres')
+        .trim()
+        .openapi({
+            param: {
+                name: 'q',
+                in: 'query',
+                example: texts.examples.label.subGroup,
+                required: true
+            },
+            description: 'Termo de pesquisa para buscar ocupações, famílias, etc.'
+        })
+
+export const QSearchParamsFamilySchema =
+    z
+        .string()
+        .min(3, 'Termo de pesquisa deve ter pelo menos 3 caracteres')
+        .max(100, 'Termo de pesquisa deve ter no máximo 100 caracteres')
+        .trim()
+        .openapi({
+            param: {
+                name: 'q',
+                in: 'query',
+                example: texts.examples.label.family,
+                required: true
+            },
+            description: 'Termo de pesquisa para buscar ocupações, famílias, etc.'
+        })
+
+export const QSearchParamsOccupationSchema =
+    z
+        .string()
+        .min(3, 'Termo de pesquisa deve ter pelo menos 3 caracteres')
+        .max(100, 'Termo de pesquisa deve ter no máximo 100 caracteres')
+        .trim()
+        .openapi({
+            param: {
+                name: 'q',
+                in: 'query',
+                example: texts.examples.label.occupation,
+                required: true
+            },
+            description: 'Termo de pesquisa para buscar ocupações, famílias, etc.'
+        })
+
+export const QSearchParamsSynonymousSchema =
+    z
+        .string()
+        .min(3, 'Termo de pesquisa deve ter pelo menos 3 caracteres')
+        .max(100, 'Termo de pesquisa deve ter no máximo 100 caracteres')
+        .trim()
+        .openapi({
+            param: {
+                name: 'q',
+                in: 'query',
+                example: texts.examples.label.synonymous,
+                required: true
+            },
+            description: 'Termo de pesquisa para buscar ocupações, famílias, etc.'
+        })
 
 // Register common schemas
 export const QPaginationQuery =

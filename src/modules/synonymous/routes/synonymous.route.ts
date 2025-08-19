@@ -12,6 +12,7 @@ const synonymousvc = new SynonymousService(synonymousRepo);
 const synonymousController = new SynonymousController(synonymousvc);
 
 synonymousRouter.get('/', synonymousController.findAll.bind(synonymousController));
+synonymousRouter.get('/search', synonymousController.searchByLabel.bind(synonymousController));
 synonymousRouter.get('/:id', synonymousController.findOneById.bind(synonymousController));
 
 export default synonymousRouter;

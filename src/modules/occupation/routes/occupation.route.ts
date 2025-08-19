@@ -12,6 +12,7 @@ const occupationvc = new OccupationService(occupationRepo);
 const occupationController = new OccupationController(occupationvc);
 
 occupationRouter.get('/', occupationController.findAll.bind(occupationController));
+occupationRouter.get('/search', occupationController.searchByLabel.bind(occupationController));
 occupationRouter.get('/:id', occupationController.findOneById.bind(occupationController));
 
 export default occupationRouter;

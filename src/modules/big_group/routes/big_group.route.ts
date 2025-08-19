@@ -11,6 +11,7 @@ const bigGroupRepo = new BigGroupRepository(bigGroupDbProvider);
 const biGroupSvc = new BigGroupService(bigGroupRepo);
 const bigGroupController = new BigGroupController(biGroupSvc);
 
+bigGroupRouter.use('/search', bigGroupController.searchByLabel.bind(bigGroupController));
 bigGroupRouter.get('/', bigGroupController.findAll.bind(bigGroupController));
 bigGroupRouter.get('/:id', bigGroupController.findOneById.bind(bigGroupController));
 

@@ -12,6 +12,7 @@ const biGroupSvc = new FamilyService(familyRepo);
 const familyController = new FamilyController(biGroupSvc);
 
 familyRouter.get('/', familyController.findAll.bind(familyController));
+familyRouter.get('/search', familyController.searchByLabel.bind(familyController));
 familyRouter.get('/:id', familyController.findOneById.bind(familyController));
 
 export default familyRouter;
